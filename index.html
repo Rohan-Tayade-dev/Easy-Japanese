@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy Japanese Quiz</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #000000; /* Black */
+            --accent-color: #FFF8E1; /* Soft Cream */
+            --dark-primary: #000000; /* Pure Black */
+            --dark-accent: #2E2E2E; /* Dark Gray */
+            --highlight: #FFD700; /* Gold */
+            --dark-text: #FFD700; /* Gold for text in dark mode */;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .dark-mode {
+            background-color: var(--dark-primary);
+            color: var(--dark-text);
+        }
+
+        .settings-icon {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .settings-icon:hover {
+            transform: rotate(20deg);
+        }
+
+        .dark-mode .settings-icon {
+            filter: brightness(0) saturate(100%) invert(85%) sepia(100%) saturate(500%) hue-rotate(0deg) brightness(100%) contrast(100%);
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .main-image {
+            width: 280px;
+            margin: 15px 0;
+        }
+
+        .level-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .level {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 15px;
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+
+        .level:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .dark-mode .level {
+            background: var(--dark-accent);
+            color: var(--highlight);
+            box-shadow: 0 4px 10px rgba(255, 215, 0, 0.2);
+        }
+    </style>
+
+    <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark-mode");
+        }
+    </script>
+</head>
+<body>
+    <img src="https://cdn-icons-png.flaticon.com/512/3524/3524659.png" alt="Settings" class="settings-icon" onclick="toggleDarkMode()">
+    
+    <div class="container">
+        <h1>Welcome to Easy Japanese </h1>
+        <p>Start your journey to learning Japanese with fun quizzes.
+            This website is made by:-rohantayade09@gmail.com
+        </p>
+        <img src="cute_logo_for_easy_Japanese_website_in_2D_anime_style-Photoroom__1_-removebg-preview.png" alt="Learning Japanese" class="main-image">
+
+        <div class="level-container">
+            <a href="zero-lessons.html" class="level">Zero - Starter 🟢</a>
+            <a href="n5-lessons.html" class="level">N5 - Beginner 📗</a>
+            <div class="level">N4 - Elementary 📘 (Coming Soon)</div>
+            <div class="level">N3 - Intermediate 📙 (Coming Soon)</div>
+            <div class="level">N2 - Advanced 📕 (Coming Soon)</div>
+            <div class="level">N1 - Expert 📓 (Coming Soon)</div>
+        </div>
+    </div>
+</body>
+</html>

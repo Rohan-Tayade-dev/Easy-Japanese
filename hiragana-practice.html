@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiragana Practice - Easy Japanese Quiz</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+        :root {
+            --primary-color: #000000;
+            --accent-color: #FFF8E1;
+            --dark-primary: #000000;
+            --dark-accent: #2E2E2E;
+            --highlight: #FFD700;
+            --dark-text: #FFD700;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark-mode {
+            background-color: var(--dark-primary);
+            color: var(--dark-text);
+        }
+        .quiz-container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .dark-mode .quiz-container {
+            background: var(--dark-accent);
+        }
+        .option {
+            display: block;
+            background: #FFD700;
+            color: black;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 22px; /* Further increased font size */
+        }
+        .option:hover {
+            background: #FFC107;
+        }
+        .dark-mode .option {
+            background: var(--dark-text);
+            color: var(--dark-primary);
+        }
+        .result {
+            font-size: 26px; /* Further increased font size */
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .restart-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: var(--accent-color);
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+            font-size: 22px; /* Further increased font size */
+        }
+        .dark-mode .restart-btn {
+            background: var(--dark-text);
+            color: var(--dark-primary);
+        }
+        #question {
+            font-size: 26px; /* Increased font size for the question */
+        }
+        .animation {
+            display: none; /* Hide initially */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 50px;
+            color: #FFD700;
+            opacity: 0;
+            animation: bounce 1.5s ease-in-out;
+        }
+        .show-animation {
+            display: block;
+            opacity: 1;
+            animation: bounce 1.5s ease-in-out;
+        }
+        @keyframes bounce {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Hiragana Practice</h1>
+        <p id="question">Loading...</p>
+        <div id="options"></div>
+        <p id="progress">0/46 completed</p>
+        <p id="mistakes">Mistakes: 0</p>
+        <p id="time">Time: 0s</p>
+        <div id="animation" class="animation">🎉</div>
+    </div>
+    <script>
+        const hiragana = [
+            "あ", "い", "う", "え", "お", "か", "き", "く", "け", "こ", "さ", "し", "す", "せ", "そ",
+            "た", "ち", "つ", "て", "と", "な", "に", "ぬ", "ね", "の", "は", "ひ", "ふ", "へ", "ほ",
+            "ま", "み", "む", "め", "も", "や", "ゆ", "よ", "ら", "り", "る", "れ", "ろ", "わ", "を", "ん"
+        ];
+        const meanings = [
+            "a", "i", "u", "e", "o", "ka", "ki", "ku", "ke", "ko", "sa", "shi", "su", "se", "so",
+            "ta", "chi", "tsu", "te", "to", "na", "ni", "nu", "ne", "no", "ha", "hi", "fu", "he", "ho",
+            "ma", "mi", "mu", "me", "mo", "ya", "yu", "yo", "ra", "ri", "ru", "re", "ro", "wa", "wo", "n"
+        ];
+
+        let progress = {};
+        let mistakes = 0;
+        let startTime = Date.now();
+
+        function updateTime() {
+            document.getElementById("time").innerText = `Time: ${Math.round((Date.now() - startTime) / 1000)}s`;
+        }
+
+        setInterval(updateTime, 1000);  // Update time every second
+
+        function showAnimation() {
+            const animation = document.getElementById("animation");
+            animation.classList.add("show-animation");
+        }
+
+        function getNextCharacter() {
+            let remaining = hiragana.filter(char => !progress[char] || progress[char] < 3);
+            return remaining.length > 0 ? remaining[Math.floor(Math.random() * remaining.length)] : null;
+        }
+
+        function loadQuestion() {
+            let currentChar = getNextCharacter();
+            if (!currentChar) {
+                let timeTaken = Math.round((Date.now() - startTime) / 1000);
+                document.querySelector('.quiz-container').innerHTML = `<h1>Practice Complete!</h1><p>You made ${mistakes} mistakes.</p><p>Time taken: ${timeTaken}s</p><a href='' class='restart-btn'>Restart</a>`;
+                showAnimation();
+                return;
+            }
+
+            document.getElementById("question").innerText = `What is the pronunciation of '${currentChar}'?`;
+            let correctAnswer = meanings[hiragana.indexOf(currentChar)];
+            let options = new Set([correctAnswer]);
+            while (options.size < 4) {
+                options.add(meanings[Math.floor(Math.random() * meanings.length)]);
+            }
+            options = Array.from(options).sort(() => Math.random() - 0.5);
+
+            document.getElementById("options").innerHTML = options.map(opt => 
+                `<div class='option' onclick='checkAnswer("${currentChar}", "${opt}")'>${opt}</div>`
+            ).join('');
+
+            document.getElementById("progress").innerText = `${Object.keys(progress).length}/46 completed`;
+            document.getElementById("mistakes").innerText = `Mistakes: ${mistakes}`;
+        }
+
+        function checkAnswer(char, answer) {
+            const options = document.querySelectorAll('.option');
+            const correctAnswer = meanings[hiragana.indexOf(char)];
+
+            options.forEach(option => {
+                option.style.pointerEvents = 'none'; // Disable further clicks
+                if (option.textContent === correctAnswer) {
+                    option.style.backgroundColor = 'green'; // Highlight correct answer in green
+                } else if (option.textContent === answer) {
+                    option.style.backgroundColor = 'red'; // Highlight wrong answer in red
+                }
+            });
+
+            if (answer === correctAnswer) {
+                progress[char] = (progress[char] || 0) + 1;
+            } else {
+                mistakes++;
+            }
+
+            setTimeout(() => {
+                loadQuestion(); // Load the next question after a short delay
+            }, 1000); // 1-second delay before loading the next question
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>

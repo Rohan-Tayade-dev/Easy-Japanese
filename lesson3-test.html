@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 3 Test</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #000000;
+            --accent-color: #FFF8E1;
+            --dark-primary: #000000;
+            --dark-accent: #2E2E2E;
+            --highlight: #FFD700;
+            --dark-text: #FFD700;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            transition: background-color 0.3s, color 0.3s;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dark-mode .quiz-container {
+            background: var(--dark-accent);
+        }
+
+        .question {
+            margin-bottom: 20px;
+            font-size: 20px;
+            text-align: left;
+            color: #333;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .option {
+            display: block;
+            background: #FFD700;
+            color: black;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .option:hover {
+            background: #FFC107;
+            transform: scale(1.02);
+        }
+
+        .option.selected {
+            background: #FFC107;
+            transform: scale(1.02);
+        }
+
+        .dark-mode .option {
+            background: var(--dark-text);
+            color: var(--dark-primary);
+        }
+
+        .result {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: var(--accent-color);
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-size: 16px;
+        }
+
+        .nav-btn:hover {
+            background: #333;
+        }
+
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .dark-mode .nav-btn {
+            background: var(--dark-text);
+            color: var(--dark-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Lesson 3 Test</h1>
+        <div id="quiz">
+            <div id="question" class="question"></div>
+            <div id="options" class="options"></div>
+        </div>
+        <div class="navigation-buttons">
+            <button id="prev-btn" class="nav-btn" onclick="prevQuestion()">Previous</button>
+        </div>
+        <button id="submit-btn" class="nav-btn" onclick="submitTest()" style="margin-top: 20px;" disabled>Submit</button>
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const terms = [
+            { term: "ここ", hiragana: "ここ", meaning: "Here, this place" },
+            { term: "そこ", hiragana: "そこ", meaning: "There, that place near you" },
+            { term: "あそこ", hiragana: "あそこ", meaning: "That place over there" },
+            { term: "どこ", hiragana: "どこ", meaning: "Where, what place?" },
+            { term: "こちら", hiragana: "こちら", meaning: "This way, this place (polite), this (polite equivalent of kore), my place, my side" },
+            { term: "そちら", hiragana: "そちら", meaning: "That way, that place near you (polite), your place" },
+            { term: "あちら", hiragana: "あちら", meaning: "That way, that place over there (polite)" },
+            { term: "どちら", hiragana: "どちら", meaning: "Which way, where (polite), which one (between two things)" },
+            { term: "教室", hiragana: "きょうしつ", meaning: "Classroom" },
+            { term: "食堂", hiragana: "しょくどう", meaning: "Dining hall, canteen" },
+            { term: "事務所", hiragana: "じむしょ", meaning: "Office" },
+            { term: "会議室", hiragana: "かいぎしつ", meaning: "Conference room, assembly room" },
+            { term: "受付", hiragana: "うけつけ", meaning: "Reception desk" },
+            { term: "ロビー", hiragana: "ロビー", meaning: "Lobby" },
+            { term: "部屋", hiragana: "へや", meaning: "Room" },
+            { term: "トイレ", hiragana: "トイレ", meaning: "Toilet, restroom" },
+            { term: "お手洗い", hiragana: "おてあらい", meaning: "Toilet, restroom" },
+            { term: "階段", hiragana: "かいだん", meaning: "Staircase" },
+            { term: "エレベーター", hiragana: "エレベーター", meaning: "Elevator, lift" },
+            { term: "エスカレーター", hiragana: "エスカレーター", meaning: "Escalator" },
+            { term: "国", hiragana: "くに", meaning: "Country" },
+            { term: "会社", hiragana: "かいしゃ", meaning: "Company" },
+            { term: "うち", hiragana: "うち", meaning: "House, home" },
+            { term: "電話", hiragana: "でんわ", meaning: "Telephone, telephone call" },
+            { term: "靴", hiragana: "くつ", meaning: "Shoes" },
+            { term: "ネクタイ", hiragana: "ネクタイ", meaning: "Necktie" },
+            { term: "ワイン", hiragana: "ワイン", meaning: "Wine" },
+            { term: "たばこ", hiragana: "たばこ", meaning: "Tobacco, cigarette" },
+            { term: "売り場", hiragana: "うりば", meaning: "Department, counter (in a department store)" },
+            { term: "地下", hiragana: "ちか", meaning: "Basement" },
+            { term: "～階", hiragana: "～かい", meaning: "~th floor" },
+            { term: "何階", hiragana: "なんがい", meaning: "What floor" },
+            { term: "～円", hiragana: "～えん", meaning: "Yen" },
+            { term: "いくら", hiragana: "いくら", meaning: "How much" },
+            { term: "百", hiragana: "ひゃく", meaning: "Hundred" },
+            { term: "千", hiragana: "せん", meaning: "Thousand" },
+            { term: "万", hiragana: "まん", meaning: "Ten thousand" },
+            { term: "すみません", hiragana: "すみません", meaning: "Excuse me, I am sorry" },
+            { term: "～でございます", hiragana: "～でございます", meaning: "(Polite form of 'desu'), be (polite)" },
+            { term: "～を見せてください", hiragana: "～をみせてください", meaning: "Please show me ~" },
+            { term: "じゃ", hiragana: "じゃ", meaning: "Well, then, in that case" },
+            { term: "～をください", hiragana: "～をください", meaning: "Give me ~, please." }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+
+        function loadQuestion() {
+            const questionDiv = document.getElementById("question");
+            const optionsDiv = document.getElementById("options");
+            const term = terms[currentQuestionIndex];
+            let questionText = term.term;
+            if (/[一-龯]/.test(term.term)) {
+                questionText += ` (${term.hiragana})`;
+            }
+            questionDiv.innerHTML = `<strong>Question ${currentQuestionIndex + 1}:</strong> What is the meaning of '${questionText}'?`;
+            optionsDiv.innerHTML = "";
+            
+            const correctAnswer = term.meaning;
+            const options = [correctAnswer];
+            while (options.length < 4) {
+                const randomOption = terms[Math.floor(Math.random() * terms.length)].meaning;
+                if (!options.includes(randomOption)) {
+                    options.push(randomOption);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+            
+            options.forEach(option => {
+                const optionDiv = document.createElement("div");
+                optionDiv.className = "option";
+                optionDiv.innerText = option;
+                optionDiv.onclick = () => selectAnswer(option);
+                optionsDiv.appendChild(optionDiv);
+            });
+        }
+
+        function selectAnswer(selectedText) {
+            userAnswers[currentQuestionIndex] = selectedText;
+            if (currentQuestionIndex < terms.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                document.getElementById("submit-btn").disabled = false;
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        }
+
+        function submitTest() {
+            let score = userAnswers.filter((answer, index) => answer === terms[index].meaning).length;
+            document.getElementById("result").innerText = `Your score: ${score} out of ${terms.length} (${score} correct answers)`;
+        }
+        
+        loadQuestion();
+    </script>
+</body>
+</html>

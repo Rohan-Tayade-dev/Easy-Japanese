@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N5 Lessons - Easy Japanese Quiz</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #000000;
+            --accent-color: #FFF8E1;
+            --dark-primary: #000000;
+            --dark-accent: #2E2E2E;
+            --highlight: #FFD700;
+            --dark-text: #FFD700;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .dark-mode {
+            background-color: var(--dark-primary);
+            color: var(--dark-text);
+        }
+
+        .settings-icon {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+        }
+
+        .dark-mode .settings-icon {
+            filter: brightness(0) saturate(100%) invert(85%) sepia(100%) saturate(500%) hue-rotate(0deg) brightness(100%) contrast(100%);
+        }
+
+        .lesson-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); 
+            gap: 15px;
+            margin-top: 20px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .lesson {
+            display: block;
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            text-align: center;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+
+        .lesson:hover {
+            transform: scale(1.05);
+        }
+
+        .dark-mode .lesson {
+            background: #2E2E2E;
+            color: #FFD700;
+        }
+
+        .coming-soon {
+            position: relative;
+            display: inline-block;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #777;
+            font-weight: normal;
+        }
+
+        .dark-mode .coming-soon {
+            color: #AAA;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: var(--accent-color);
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        .dark-mode .back-button {
+            background: var(--dark-text);
+            color: var(--dark-primary);
+        }
+
+        .back-button:hover {
+            opacity: 0.8;
+        }
+    </style>
+    <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark-mode");
+        }
+    </script>
+</head>
+<body>
+    <img src="https://cdn-icons-png.flaticon.com/512/3524/3524659.png" alt="Settings" class="settings-icon" onclick="toggleDarkMode()">
+    <h1>N5 - Beginner 📗</h1>
+    <p>Select a lesson:</p>
+
+    <div class="lesson-container">
+        <!-- Only first 5 lessons are active -->
+        <a href="lesson1.html" class="lesson">Lesson 1</a>
+        <a href="lesson2.html" class="lesson">Lesson 2</a>
+        <a href="lesson3.html" class="lesson">Lesson 3</a>
+        <a href="lesson4.html" class="lesson">Lesson 4</a>
+        <a href="lesson5.html" class="lesson">Lesson 5</a>
+        
+        <!-- Remaining lessons are shown as coming soon -->
+        <div class="lesson" style="cursor: not-allowed; opacity: 0.7;">
+            Lesson 6
+            <span class="coming-soon">(Coming Soon)</span>
+        </div>
+        <div class="lesson" style="cursor: not-allowed; opacity: 0.7;">
+            Lesson 7
+            <span class="coming-soon">(Coming Soon)</span>
+        </div>
+        <div class="lesson" style="cursor: not-allowed; opacity: 0.7;">
+            Lesson 8
+            <span class="coming-soon">(Coming Soon)</span>
+        </div>
+        <div class="lesson" style="cursor: not-allowed; opacity: 0.7;">
+            Lesson 9
+            <span class="coming-soon">(Coming Soon)</span>
+        </div>
+        <div class="lesson" style="cursor: not-allowed; opacity: 0.7;">
+            Lesson 10
+            <span class="coming-soon">(Coming Soon)</span>
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <a href="index.html" class="back-button">⬅ Back</a>
+</body>
+</html>

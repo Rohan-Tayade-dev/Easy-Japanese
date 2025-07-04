@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 1 Test</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #000000;
+            --accent-color: #FFF8E1;
+            --dark-primary: #000000;
+            --dark-accent: #2E2E2E;
+            --highlight: #FFD700;
+            --dark-text: #FFD700;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            transition: background-color 0.3s, color 0.3s;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dark-mode .quiz-container {
+            background: var(--dark-accent);
+        }
+
+        .question {
+            margin-bottom: 20px;
+            font-size: 20px;
+            text-align: left;
+            color: #333;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .option {
+            display: block;
+            background: #FFD700;
+            color: black;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .option:hover {
+            background: #FFC107;
+            transform: scale(1.02);
+        }
+
+        .option.selected {
+            background: #FFC107;
+            transform: scale(1.02);
+        }
+
+        .dark-mode .option {
+            background: var(--dark-text);
+            color: var(--dark-primary);
+        }
+
+        .result {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: var(--accent-color);
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-size: 16px;
+        }
+
+        .nav-btn:hover {
+            background: #333;
+        }
+
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .dark-mode .nav-btn {
+            background: var(--dark-text);
+            color: var(--dark-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Lesson 1 Test</h1>
+        <div id="quiz">
+            <div id="question" class="question"></div>
+            <div id="options" class="options"></div>
+        </div>
+        <div class="navigation-buttons">
+            <button id="prev-btn" class="nav-btn" onclick="prevQuestion()">Previous</button>
+        </div>
+        <button id="submit-btn" class="nav-btn" onclick="submitTest()" style="margin-top: 20px;" disabled>Submit</button>
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const terms = [
+            { term: "わたし", hiragana: "わたし", meaning: "I" },
+            { term: "わたしたち", hiragana: "わたしたち", meaning: "We" },
+            { term: "あなた", hiragana: "あなた", meaning: "You" },
+            { term: "あの人", hiragana: "あのひと", meaning: "That person" },
+            { term: "あの方", hiragana: "あのかた", meaning: "That person (polite)" },
+            { term: "皆さん", hiragana: "みなさん", meaning: "Ladies and gentlemen" },
+            { term: "～さん", hiragana: "～さん", meaning: "Mr./Ms." },
+            { term: "～ちゃん", hiragana: "～ちゃん", meaning: "Child’s name suffix" },
+            { term: "～君", hiragana: "～くん", meaning: "Boy’s name suffix" },
+            { term: "～人", hiragana: "～じん", meaning: "Nationality suffix" },
+            { term: "先生", hiragana: "せんせい", meaning: "Teacher" },
+            { term: "教師", hiragana: "きょうし", meaning: "Teacher" },
+            { term: "学生", hiragana: "がくせい", meaning: "Student" },
+            { term: "会社員", hiragana: "かいしゃいん", meaning: "Company employee" },
+            { term: "社員", hiragana: "しゃいん", meaning: "Company employee" },
+            { term: "銀行員", hiragana: "ぎんこういん", meaning: "Bank employee" },
+            { term: "医者", hiragana: "いしゃ", meaning: "Medical doctor" },
+            { term: "研究者", hiragana: "けんきゅうしゃ", meaning: "Researcher" },
+            { term: "エンジニア", hiragana: "エンジニア", meaning: "Engineer" },
+            { term: "大学", hiragana: "だいがく", meaning: "University" },
+            { term: "病院", hiragana: "びょういん", meaning: "Hospital" },
+            { term: "電気", hiragana: "でんき", meaning: "Light" },
+            { term: "だれ", hiragana: "だれ", meaning: "Who" },
+            { term: "どなた", hiragana: "どなた", meaning: "Who (polite)" },
+            { term: "～歳", hiragana: "～さい", meaning: "Years old" },
+            { term: "何歳", hiragana: "なんさい", meaning: "How old" },
+            { term: "おいくつ", hiragana: "おいくつ", meaning: "How old (polite)" },
+            { term: "はい", hiragana: "はい", meaning: "Yes" },
+            { term: "いいえ", hiragana: "いいえ", meaning: "No" },
+            { term: "失礼ですが", hiragana: "しつれいですが", meaning: "Excuse me, but" },
+            { term: "お名前は", hiragana: "おなまえは", meaning: "May I have your name?" },
+            { term: "初めまして", hiragana: "はじめまして", meaning: "How do you do?" },
+            { term: "どうぞよろしく", hiragana: "どうぞよろしく", meaning: "Pleased to meet you" },
+            { term: "こちらは～さんです", hiragana: "こちらは～さんです", meaning: "This is Mr./Ms. ~" },
+            { term: "～から来ました", hiragana: "～からきました", meaning: "I came from ~" },
+            { term: "アメリカ", hiragana: "アメリカ", meaning: "U.S.A." },
+            { term: "イギリス", hiragana: "イギリス", meaning: "U.K." },
+            { term: "インド", hiragana: "インド", meaning: "India" },
+            { term: "インドネシア", hiragana: "インドネシア", meaning: "Indonesia" },
+            { term: "韓国", hiragana: "かんこく", meaning: "South Korea" },
+            { term: "タイ", hiragana: "タイ", meaning: "Thailand" },
+            { term: "中国", hiragana: "ちゅうごく", meaning: "China" },
+            { term: "ドイツ", hiragana: "ドイツ", meaning: "Germany" },
+            { term: "日本", hiragana: "にほん", meaning: "Japan" },
+            { term: "フランス", hiragana: "フランス", meaning: "France" },
+            { term: "ブラジル", hiragana: "ブラジル", meaning: "Brazil" }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+
+        function loadQuestion() {
+            const questionDiv = document.getElementById("question");
+            const optionsDiv = document.getElementById("options");
+            const term = terms[currentQuestionIndex];
+            let questionText = term.term;
+            if (/[一-龯]/.test(term.term)) {
+                questionText += ` (${term.hiragana})`;
+            }
+            questionDiv.innerHTML = `<strong>Question ${currentQuestionIndex + 1}:</strong> What is the meaning of '${questionText}'?`;
+            optionsDiv.innerHTML = "";
+            
+            const correctAnswer = term.meaning;
+            const options = [correctAnswer];
+            while (options.length < 4) {
+                const randomOption = terms[Math.floor(Math.random() * terms.length)].meaning;
+                if (!options.includes(randomOption)) {
+                    options.push(randomOption);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+            
+            options.forEach(option => {
+                const optionDiv = document.createElement("div");
+                optionDiv.className = "option";
+                optionDiv.innerText = option;
+                optionDiv.onclick = () => selectAnswer(option);
+                optionsDiv.appendChild(optionDiv);
+            });
+        }
+
+        function selectAnswer(selectedText) {
+            userAnswers[currentQuestionIndex] = selectedText;
+            if (currentQuestionIndex < terms.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                document.getElementById("submit-btn").disabled = false;
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        }
+
+        function submitTest() {
+            let score = userAnswers.filter((answer, index) => answer === terms[index].meaning).length;
+            document.getElementById("result").innerText = `Your score: ${score} out of ${terms.length} (${score} correct answers)`;
+        }
+        
+        loadQuestion();
+    </script>
+</body>
+</html>

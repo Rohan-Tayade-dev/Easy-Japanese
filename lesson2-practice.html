@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 2 Practice</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #000000;
+            --accent-color: #FFF8E1;
+            --dark-primary: #000000;
+            --dark-accent: #2E2E2E;
+            --highlight: #FFD700;
+            --dark-text: #FFD700;
+            --correct-color: #4CAF50;
+            --incorrect-color: #FF5252;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            transition: background-color 0.3s, color 0.3s;
+            margin: 0;
+            padding: 0;
+        }
+
+        .dark-mode {
+            background-color: var(--dark-primary);
+            color: var(--dark-text);
+        }
+
+        .quiz-container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dark-mode .quiz-container {
+            background: var(--dark-accent);
+        }
+
+        .option {
+            display: block;
+            background: #FFD700;
+            color: black;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            font-size: 20px;
+        }
+
+        .option:hover {
+            background: #FFC107;
+            transform: scale(1.05);
+        }
+
+        .dark-mode .option {
+            background: var(--dark-text);
+            color: var(--dark-primary);
+        }
+
+        .result {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .restart-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: var(--accent-color);
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+            font-size: 20px;
+        }
+
+        .dark-mode .restart-btn {
+            background: var(--dark-text);
+            color: var(--dark-primary);
+        }
+
+        #question {
+            font-size: 24px;
+        }
+
+        #hiragana {
+            font-size: 18px;
+            color: #555;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Quick Japanese Practice</h1>
+        <p id="question">Loading...</p>
+        <p id="hiragana"></p>
+        <div id="options"></div>
+        <p id="progress">0/48 completed</p>
+        <p id="mistakes">Mistakes: 0</p>
+        <p id="time">Time: 0s</p>
+    </div>
+    <script>
+        const terms = [
+            { term: "これ", hiragana: "これ", meaning: "This (thing here)" },
+            { term: "それ", hiragana: "それ", meaning: "That (thing near you)" },
+            { term: "あれ", hiragana: "あれ", meaning: "That (thing over there), Oh! (in surprise or in wonder)" },
+            { term: "この～", hiragana: "この～", meaning: "This ~, this ~ here" },
+            { term: "その～", hiragana: "その～", meaning: "That ~, that ~ there" },
+            { term: "あの～", hiragana: "あの～", meaning: "That ~, that ~ over there" },
+            { term: "本", hiragana: "ほん", meaning: "Book" },
+            { term: "辞書", hiragana: "じしょ", meaning: "Dictionary" },
+            { term: "雑誌", hiragana: "ざっし", meaning: "Magazine" },
+            { term: "新聞", hiragana: "しんぶん", meaning: "Newspaper" },
+            { term: "ノート", hiragana: "ノート", meaning: "Notebook" },
+            { term: "手帳", hiragana: "てちょう", meaning: "Pocket notebook" },
+            { term: "名刺", hiragana: "めいし", meaning: "Business card" },
+            { term: "カード", hiragana: "カード", meaning: "Card" },
+            { term: "テレホンカード", hiragana: "テレホンカード", meaning: "Telephone card" },
+            { term: "鉛筆", hiragana: "えんぴつ", meaning: "Pencil" },
+            { term: "ボールペン", hiragana: "ボールペン", meaning: "Ballpoint pen" },
+            { term: "シャープペンシル", hiragana: "シャープペンシル", meaning: "Mechanical pencil" },
+            { term: "かぎ", hiragana: "かぎ", meaning: "Key" },
+            { term: "時計", hiragana: "とけい", meaning: "Watch, clock" },
+            { term: "傘", hiragana: "かさ", meaning: "Umbrella" },
+            { term: "かばん", hiragana: "かばん", meaning: "Bag, briefcase" },
+            { term: "テープ", hiragana: "テープ", meaning: "(Cassette) tape" },
+            { term: "テープレコーダー", hiragana: "テープレコーダー", meaning: "Tape recorder" },
+            { term: "テレビ", hiragana: "テレビ", meaning: "Television" },
+            { term: "ラジオ", hiragana: "ラジオ", meaning: "Radio" },
+            { term: "カメラ", hiragana: "カメラ", meaning: "Camera" },
+            { term: "コンピューター", hiragana: "コンピューター", meaning: "Computer" },
+            { term: "自動車", hiragana: "じどうしゃ", meaning: "Automobile, car" },
+            { term: "机", hiragana: "つくえ", meaning: "Desk" },
+            { term: "いす", hiragana: "いす", meaning: "Chair" },
+            { term: "チョコレート", hiragana: "チョコレート", meaning: "Chocolate" },
+            { term: "コーヒー", hiragana: "コーヒー", meaning: "Coffee" },
+            { term: "英語", hiragana: "えいご", meaning: "The English language" },
+            { term: "日本語", hiragana: "にほんご", meaning: "The Japanese language" },
+            { term: "～語", hiragana: "～ご", meaning: "~ language" },
+            { term: "何", hiragana: "なん", meaning: "What" },
+            { term: "そう", hiragana: "そう", meaning: "So" },
+            { term: "違います", hiragana: "ちがいます", meaning: "No it isn't, You are wrong, be different" },
+            { term: "そうですか", hiragana: "そうですか", meaning: "I see, Is that so?" },
+            { term: "あのう", hiragana: "あのう", meaning: "Well (used to show hesitation)" },
+            { term: "ほんの気持ちです", hiragana: "ほんのきもちです", meaning: "It's nothing, It's a token of my gratitude" },
+            { term: "どうぞ", hiragana: "どうぞ", meaning: "Please, Here you are (when offering someone something)" },
+            { term: "どうも", hiragana: "どうも", meaning: "Well, thanks, it appears that (used when making a tentative judgement)" },
+            { term: "ありがとう", hiragana: "ありがとう", meaning: "Thank you" },
+            { term: "どうもありがとうございます", hiragana: "どうもありがとございます", meaning: "Thank you very much" },
+            { term: "これからお世話になります", hiragana: "これからおせわになります", meaning: "I hope for your kind assistance hereafter" },
+            { term: "こちらこそよろしく", hiragana: "こちらこそよろしく", meaning: "I am pleased to meet you" }
+        ];
+
+        let progress = {}; // Tracks correct/incorrect answers
+        let mistakes = 0; // Total mistakes
+        let startTime = Date.now(); // Start time of the quiz
+        let totalQuestions = 48; // Total questions in the session
+        let incorrectTerms = []; // Stores terms answered incorrectly
+        let questionsAnswered = 0; // Counter for questions answered
+
+        function updateTime() {
+            document.getElementById("time").innerText = `Time: ${Math.round((Date.now() - startTime) / 1000)}s`;
+        }
+        setInterval(updateTime, 1000);
+
+        function getNextTerm() {
+            // Prioritize incorrect terms first
+            if (incorrectTerms.length > 0) {
+                return incorrectTerms.shift(); // Return and remove the first incorrect term
+            }
+            // Otherwise, pick a random term that hasn't been asked yet
+            let remaining = terms.filter(term => !progress[term.term]);
+            return remaining.length > 0 ? remaining[Math.floor(Math.random() * remaining.length)] : null;
+        }
+
+        function loadQuestion() {
+            questionsAnswered = Object.keys(progress).length; // Update counter based on actual progress
+            document.getElementById("progress").innerText = `${questionsAnswered}/${totalQuestions} completed`;
+            document.getElementById("mistakes").innerText = `Mistakes: ${mistakes}`;
+
+            if (questionsAnswered >= totalQuestions) {
+                let timeTaken = Math.round((Date.now() - startTime) / 1000);
+                document.querySelector(".quiz-container").innerHTML = `
+                    <h1>Practice Complete!</h1>
+                    <p>You made ${mistakes} mistakes.</p>
+                    <p>Time taken: ${timeTaken}s</p>
+                    <a href='' class='restart-btn'>Restart</a>
+                `;
+                return;
+            }
+
+            let currentTerm = getNextTerm();
+            if (!currentTerm) {
+                return; // No need for duplicate completion code
+            }
+
+            document.getElementById("question").innerText = `What is the meaning of '${currentTerm.term}'?`;
+            document.getElementById("hiragana").innerText = `Hiragana: ${currentTerm.hiragana}`; // Display hiragana
+            let correctAnswer = currentTerm.meaning;
+            let options = new Set([correctAnswer]);
+            while (options.size < 4) {
+                options.add(terms[Math.floor(Math.random() * terms.length)].meaning);
+            }
+            options = Array.from(options).sort(() => Math.random() - 0.5);
+
+            document.getElementById("options").innerHTML = options.map(opt => 
+                `<div class='option' onclick='checkAnswer("${currentTerm.term}", "${opt}")'>${opt}</div>`
+            ).join('');
+        }
+
+        function checkAnswer(term, answer) {
+            const options = document.querySelectorAll('.option');
+            const correctAnswer = terms.find(t => t.term === term).meaning;
+
+            options.forEach(option => {
+                option.style.pointerEvents = 'none';
+                if (option.textContent === correctAnswer) {
+                    option.style.backgroundColor = 'var(--correct-color)';
+                } else if (option.textContent === answer) {
+                    option.style.backgroundColor = 'var(--incorrect-color)';
+                }
+            });
+
+            if (answer === correctAnswer) {
+                progress[term] = true; // Mark as correct
+            } else {
+                mistakes++;
+                incorrectTerms.push(terms.find(t => t.term === term)); // Add to incorrect list
+            }
+
+            setTimeout(() => {
+                loadQuestion();
+            }, 1000);
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>

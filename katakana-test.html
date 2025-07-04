@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katakana Test</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+        :root {
+            --primary-color: #000000;
+            --accent-color: #FFF8E1;
+            --dark-primary: #000000;
+            --dark-accent: #2E2E2E;
+            --highlight: #FFD700;
+            --dark-text: #FFD700;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark-mode {
+            background-color: var(--dark-primary);
+            color: var(--dark-text);
+        }
+        .quiz-container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .dark-mode .quiz-container {
+            background: var(--dark-accent);
+        }
+        .option {
+            display: block;
+            background: #FFD700;
+            color: black;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 22px;
+        }
+        .option:hover {
+            background: #FFC107;
+        }
+        .dark-mode .option {
+            background: var(--dark-text);
+            color: var(--dark-primary);
+        }
+        .result {
+            font-size: 26px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .restart-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: var(--accent-color);
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+            font-size: 22px;
+        }
+        .dark-mode .restart-btn {
+            background: var(--dark-text);
+            color: var(--dark-primary);
+        }
+        #question {
+            font-size: 26px;
+        }
+        .animation {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 50px;
+            color: #FFD700;
+            opacity: 0;
+            animation: bounce 1.5s ease-in-out;
+        }
+        .show-animation {
+            display: block;
+            opacity: 1;
+            animation: bounce 1.5s ease-in-out;
+        }
+        @keyframes bounce {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Katakana Test</h1>
+        <p id="question">Loading...</p>
+        <div id="options"></div>
+        <p id="progress">0/46 completed</p>
+        <p id="mistakes">Mistakes: 0</p>
+        <p id="time">Time: 0s</p>
+        <div id="animation" class="animation">🎉</div>
+    </div>
+    <script>
+        const katakana = [
+            { character: 'ア', romanji: 'a' },
+            { character: 'イ', romanji: 'i' },
+            { character: 'ウ', romanji: 'u' },
+            { character: 'エ', romanji: 'e' },
+            { character: 'オ', romanji: 'o' },
+            { character: 'カ', romanji: 'ka' },
+            { character: 'キ', romanji: 'ki' },
+            { character: 'ク', romanji: 'ku' },
+            { character: 'ケ', romanji: 'ke' },
+            { character: 'コ', romanji: 'ko' },
+            { character: 'サ', romanji: 'sa' },
+            { character: 'シ', romanji: 'shi' },
+            { character: 'ス', romanji: 'su' },
+            { character: 'セ', romanji: 'se' },
+            { character: 'ソ', romanji: 'so' },
+            { character: 'タ', romanji: 'ta' },
+            { character: 'チ', romanji: 'chi' },
+            { character: 'ツ', romanji: 'tsu' },
+            { character: 'テ', romanji: 'te' },
+            { character: 'ト', romanji: 'to' },
+            { character: 'ナ', romanji: 'na' },
+            { character: 'ニ', romanji: 'ni' },
+            { character: 'ヌ', romanji: 'nu' },
+            { character: 'ネ', romanji: 'ne' },
+            { character: 'ノ', romanji: 'no' },
+            { character: 'ハ', romanji: 'ha' },
+            { character: 'ヒ', romanji: 'hi' },
+            { character: 'フ', romanji: 'fu' },
+            { character: 'ヘ', romanji: 'he' },
+            { character: 'ホ', romanji: 'ho' },
+            { character: 'マ', romanji: 'ma' },
+            { character: 'ミ', romanji: 'mi' },
+            { character: 'ム', romanji: 'mu' },
+            { character: 'メ', romanji: 'me' },
+            { character: 'モ', romanji: 'mo' },
+            { character: 'ヤ', romanji: 'ya' },
+            { character: 'ユ', romanji: 'yu' },
+            { character: 'ヨ', romanji: 'yo' },
+            { character: 'ラ', romanji: 'ra' },
+            { character: 'リ', romanji: 'ri' },
+            { character: 'ル', romanji: 'ru' },
+            { character: 'レ', romanji: 're' },
+            { character: 'ロ', romanji: 'ro' },
+            { character: 'ワ', romanji: 'wa' },
+            { character: 'ヲ', romanji: 'wo' },
+            { character: 'ン', romanji: 'n' }
+        ];
+
+        let shuffledKatakana = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let mistakes = 0;
+        let startTime = Date.now();
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function getOptions(correctAnswer) {
+            const options = [correctAnswer];
+            while (options.length < 4) {
+                const randomOption = katakana[Math.floor(Math.random() * katakana.length)].romanji;
+                if (!options.includes(randomOption)) {
+                    options.push(randomOption);
+                }
+            }
+            return shuffleArray(options);
+        }
+
+        function displayQuestion() {
+            if (currentQuestionIndex >= 46) {
+                endQuiz();
+                return;
+            }
+
+            const questionData = shuffledKatakana[currentQuestionIndex];
+            const options = getOptions(questionData.romanji);
+            document.getElementById("question").innerText = `What is the romanji for '${questionData.character}'?`;
+            document.getElementById("options").innerHTML = options.map(option => `
+                <div class="option" onclick="checkAnswer('${option}', '${questionData.romanji}')">${option}</div>
+            `).join('');
+            document.getElementById("progress").innerText = `${currentQuestionIndex + 1}/46 completed`;
+            document.getElementById("mistakes").innerText = `Mistakes: ${mistakes}`;
+        }
+
+        function checkAnswer(selectedOption, correctAnswer) {
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.style.pointerEvents = 'none';
+                if (option.textContent === correctAnswer) {
+                    option.style.backgroundColor = 'green';
+                } else if (option.textContent === selectedOption) {
+                    option.style.backgroundColor = 'red';
+                }
+            });
+
+            if (selectedOption === correctAnswer) {
+                score++;
+            } else {
+                mistakes++;
+            }
+
+            currentQuestionIndex++;
+            if (currentQuestionIndex < 46) {
+                setTimeout(displayQuestion, 1000);
+            } else {
+                endQuiz();
+            }
+        }
+
+        function endQuiz() {
+            const timeTaken = Math.round((Date.now() - startTime) / 1000);
+            document.querySelector('.quiz-container').innerHTML = `
+                <h1>Test Complete!</h1>
+                <p>Your score: ${score}/46</p>
+                <p>Mistakes: ${mistakes}</p>
+                <p>Time taken: ${timeTaken}s</p>
+                <a href='' class='restart-btn'>Restart</a>
+            `;
+            showAnimation();
+        }
+
+        function showAnimation() {
+            const animation = document.getElementById("animation");
+            animation.classList.add("show-animation");
+        }
+
+        function updateTime() {
+            document.getElementById("time").innerText = `Time: ${Math.round((Date.now() - startTime) / 1000)}s`;
+        }
+
+        setInterval(updateTime, 1000);
+
+        // Shuffle the katakana array and start the quiz
+        shuffledKatakana = shuffleArray([...katakana]);
+        displayQuestion();
+    </script>
+</body>
+</html>

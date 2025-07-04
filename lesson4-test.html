@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 4 Test</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #000000;
+            --accent-color: #FFF8E1;
+            --dark-primary: #000000;
+            --dark-accent: #2E2E2E;
+            --highlight: #FFD700;
+            --dark-text: #FFD700;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            transition: background-color 0.3s, color 0.3s;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dark-mode .quiz-container {
+            background: var(--dark-accent);
+        }
+
+        .question {
+            margin-bottom: 20px;
+            font-size: 20px;
+            text-align: left;
+            color: #333;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .option {
+            display: block;
+            background: #FFD700;
+            color: black;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .option:hover {
+            background: #FFC107;
+            transform: scale(1.02);
+        }
+
+        .option.selected {
+            background: #FFC107;
+            transform: scale(1.02);
+        }
+
+        .dark-mode .option {
+            background: var(--dark-text);
+            color: var(--dark-primary);
+        }
+
+        .result {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: var(--accent-color);
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-size: 16px;
+        }
+
+        .nav-btn:hover {
+            background: #333;
+        }
+
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .dark-mode .nav-btn {
+            background: var(--dark-text);
+            color: var(--dark-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Lesson 4 Test</h1>
+        <div id="quiz">
+            <div id="question" class="question"></div>
+            <div id="options" class="options"></div>
+        </div>
+        <div class="navigation-buttons">
+            <button id="prev-btn" class="nav-btn" onclick="prevQuestion()">Previous</button>
+        </div>
+        <button id="submit-btn" class="nav-btn" onclick="submitTest()" style="margin-top: 20px;" disabled>Submit</button>
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const terms = [
+            { term: "起きます", hiragana: "おきます", meaning: "Get up, wake up, happen" },
+            { term: "寝ます", hiragana: "ねます", meaning: "Sleep, go to bed" },
+            { term: "働きます", hiragana: "はたらきます", meaning: "Work" },
+            { term: "休みます", hiragana: "やすみます", meaning: "Take a rest, take a holiday, go to bed, sleep" },
+            { term: "勉強します", hiragana: "べんきょうします", meaning: "Study" },
+            { term: "終わります", hiragana: "おわります", meaning: "Finish" },
+            { term: "デパート", hiragana: "デパート", meaning: "Department store" },
+            { term: "銀行", hiragana: "ぎんこう", meaning: "Bank" },
+            { term: "郵便局", hiragana: "ゆうびんきょく", meaning: "Post office" },
+            { term: "図書館", hiragana: "としょかん", meaning: "Library" },
+            { term: "美術館", hiragana: "びじゅつかん", meaning: "Art museum" },
+            { term: "今", hiragana: "いま", meaning: "Now" },
+            { term: "～時", hiragana: "～じ", meaning: "~o'clock" },
+            { term: "～分", hiragana: "～ふん", meaning: "~ minute" },
+            { term: "半", hiragana: "はん", meaning: "Half" },
+            { term: "何時", hiragana: "なんじ", meaning: "What time" },
+            { term: "何分", hiragana: "なんぷん", meaning: "What minute" },
+            { term: "午前", hiragana: "ごぜん", meaning: "A.m., morning" },
+            { term: "午後", hiragana: "ごご", meaning: "P.m., afternoon" },
+            { term: "朝", hiragana: "あさ", meaning: "Morning" },
+            { term: "昼", hiragana: "ひる", meaning: "Daytime, noon" },
+            { term: "晩", hiragana: "ばん", meaning: "Night, evening" },
+            { term: "夜", hiragana: "よる", meaning: "Night, evening" },
+            { term: "おととい", hiragana: "おととい", meaning: "The day before yesterday" },
+            { term: "きのう", hiragana: "きのう", meaning: "Yesterday" },
+            { term: "きょう", hiragana: "きょう", meaning: "Today" },
+            { term: "あした", hiragana: "あした", meaning: "Tomorrow" },
+            { term: "あさって", hiragana: "あさって", meaning: "The day after tomorrow" },
+            { term: "けさ", hiragana: "けさ", meaning: "This morning" },
+            { term: "今晩", hiragana: "こんばん", meaning: "This evening, tonight" },
+            { term: "休み", hiragana: "やすみ", meaning: "Rest, a holiday, a day off" },
+            { term: "昼休み", hiragana: "ひるやすみ", meaning: "Lunchtime" },
+            { term: "毎朝", hiragana: "まいあさ", meaning: "Every morning" },
+            { term: "毎晩", hiragana: "まいばん", meaning: "Every evening" },
+            { term: "毎日", hiragana: "まいにち", meaning: "Every day" },
+            { term: "月曜日", hiragana: "げつようび", meaning: "Monday" },
+            { term: "火曜日", hiragana: "かようび", meaning: "Tuesday" },
+            { term: "水曜日", hiragana: "すいようび", meaning: "Wednesday" },
+            { term: "木曜日", hiragana: "もくようび", meaning: "Thursday" },
+            { term: "金曜日", hiragana: "きんようび", meaning: "Friday" },
+            { term: "土曜日", hiragana: "どようび", meaning: "Saturday" },
+            { term: "日曜日", hiragana: "にちようび", meaning: "Sunday" },
+            { term: "何曜日", hiragana: "なんようび", meaning: "What day of the week" },
+            { term: "番号", hiragana: "ばんごう", meaning: "Number" },
+            { term: "何番", hiragana: "なんばん", meaning: "What number" },
+            { term: "～から", hiragana: "～から", meaning: "From ~, because ~" },
+            { term: "～まで", hiragana: "～まで", meaning: "Up to ~, until ~" },
+            { term: "～と～", hiragana: "～と～", meaning: "And (used to connect nouns)" },
+            { term: "大変ですね", hiragana: "たいへんですね", meaning: "That's tough, isn't it? (used when expressing sympathy)" },
+            { term: "えーと", hiragana: "えーと", meaning: "Well, let me see" },
+            { term: "お願いします", hiragana: "おねがいします", meaning: "Please. (lit. ask for a favor)" },
+            { term: "かしこまりました", hiragana: "かしこまりました", meaning: "Certainly (sir, madam)" },
+            { term: "お問い合わせの番号", hiragana: "おといあわせのばんごう", meaning: "The number being inquired about" },
+            { term: "どうもありがとうごさいした", hiragana: "どうもありがとうごさいした", meaning: "Thank you very much" },
+            { term: "ニューヨーク", hiragana: "ニューヨーク", meaning: "New York" },
+            { term: "ペキン", hiragana: "ペキン", meaning: "Beijing" },
+            { term: "ロンドン", hiragana: "ロンドン", meaning: "London" },
+            { term: "バンコク", hiragana: "バンコク", meaning: "Bangkok" },
+            { term: "ロサンゼルス", hiragana: "ロサンゼルス", meaning: "Los Angeles" }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+
+        function loadQuestion() {
+            const questionDiv = document.getElementById("question");
+            const optionsDiv = document.getElementById("options");
+            const term = terms[currentQuestionIndex];
+            let questionText = term.term;
+            if (/[一-龯]/.test(term.term)) {
+                questionText += ` (${term.hiragana})`;
+            }
+            questionDiv.innerHTML = `<strong>Question ${currentQuestionIndex + 1}:</strong> What is the meaning of '${questionText}'?`;
+            optionsDiv.innerHTML = "";
+            
+            const correctAnswer = term.meaning;
+            const options = [correctAnswer];
+            while (options.length < 4) {
+                const randomOption = terms[Math.floor(Math.random() * terms.length)].meaning;
+                if (!options.includes(randomOption)) {
+                    options.push(randomOption);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+            
+            options.forEach(option => {
+                const optionDiv = document.createElement("div");
+                optionDiv.className = "option";
+                optionDiv.innerText = option;
+                optionDiv.onclick = () => selectAnswer(option);
+                optionsDiv.appendChild(optionDiv);
+            });
+        }
+
+        function selectAnswer(selectedText) {
+            userAnswers[currentQuestionIndex] = selectedText;
+            if (currentQuestionIndex < terms.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                document.getElementById("submit-btn").disabled = false;
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        }
+
+        function submitTest() {
+            let score = userAnswers.filter((answer, index) => answer === terms[index].meaning).length;
+            document.getElementById("result").innerText = `Your score: ${score} out of ${terms.length} (${score} correct answers)`;
+        }
+        
+        loadQuestion();
+    </script>
+</body>
+</html>

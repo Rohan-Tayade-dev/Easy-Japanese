@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 2 Test</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #000000;
+            --accent-color: #FFF8E1;
+            --dark-primary: #000000;
+            --dark-accent: #2E2E2E;
+            --highlight: #FFD700;
+            --dark-text: #FFD700;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            transition: background-color 0.3s, color 0.3s;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dark-mode .quiz-container {
+            background: var(--dark-accent);
+        }
+
+        .question {
+            margin-bottom: 20px;
+            font-size: 20px;
+            text-align: left;
+            color: #333;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .option {
+            display: block;
+            background: #FFD700;
+            color: black;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .option:hover {
+            background: #FFC107;
+            transform: scale(1.02);
+        }
+
+        .option.selected {
+            background: #FFC107;
+            transform: scale(1.02);
+        }
+
+        .dark-mode .option {
+            background: var(--dark-text);
+            color: var(--dark-primary);
+        }
+
+        .result {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: var(--accent-color);
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-size: 16px;
+        }
+
+        .nav-btn:hover {
+            background: #333;
+        }
+
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .dark-mode .nav-btn {
+            background: var(--dark-text);
+            color: var(--dark-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Lesson 2 Test</h1>
+        <div id="quiz">
+            <div id="question" class="question"></div>
+            <div id="options" class="options"></div>
+        </div>
+        <div class="navigation-buttons">
+            <button id="prev-btn" class="nav-btn" onclick="prevQuestion()">Previous</button>
+        </div>
+        <button id="submit-btn" class="nav-btn" onclick="submitTest()" style="margin-top: 20px;" disabled>Submit</button>
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const terms = [
+            { term: "これ", hiragana: "これ", meaning: "This (thing here)" },
+            { term: "それ", hiragana: "それ", meaning: "That (thing near you)" },
+            { term: "あれ", hiragana: "あれ", meaning: "That (thing over there), Oh! (in surprise or in wonder)" },
+            { term: "この～", hiragana: "この～", meaning: "This ~, this ~ here" },
+            { term: "その～", hiragana: "その～", meaning: "That ~, that ~ there" },
+            { term: "あの～", hiragana: "あの～", meaning: "That ~, that ~ over there" },
+            { term: "本", hiragana: "ほん", meaning: "Book" },
+            { term: "辞書", hiragana: "じしょ", meaning: "Dictionary" },
+            { term: "雑誌", hiragana: "ざっし", meaning: "Magazine" },
+            { term: "新聞", hiragana: "しんぶん", meaning: "Newspaper" },
+            { term: "ノート", hiragana: "ノート", meaning: "Notebook" },
+            { term: "手帳", hiragana: "てちょう", meaning: "Pocket notebook" },
+            { term: "名刺", hiragana: "めいし", meaning: "Business card" },
+            { term: "カード", hiragana: "カード", meaning: "Card" },
+            { term: "テレホンカード", hiragana: "テレホンカード", meaning: "Telephone card" },
+            { term: "鉛筆", hiragana: "えんぴつ", meaning: "Pencil" },
+            { term: "ボールペン", hiragana: "ボールペン", meaning: "Ballpoint pen" },
+            { term: "シャープペンシル", hiragana: "シャープペンシル", meaning: "Mechanical pencil" },
+            { term: "かぎ", hiragana: "かぎ", meaning: "Key" },
+            { term: "時計", hiragana: "とけい", meaning: "Watch, clock" },
+            { term: "傘", hiragana: "かさ", meaning: "Umbrella" },
+            { term: "かばん", hiragana: "かばん", meaning: "Bag, briefcase" },
+            { term: "テープ", hiragana: "テープ", meaning: "(Cassette) tape" },
+            { term: "テープレコーダー", hiragana: "テープレコーダー", meaning: "Tape recorder" },
+            { term: "テレビ", hiragana: "テレビ", meaning: "Television" },
+            { term: "ラジオ", hiragana: "ラジオ", meaning: "Radio" },
+            { term: "カメラ", hiragana: "カメラ", meaning: "Camera" },
+            { term: "コンピューター", hiragana: "コンピューター", meaning: "Computer" },
+            { term: "自動車", hiragana: "じどうしゃ", meaning: "Automobile, car" },
+            { term: "机", hiragana: "つくえ", meaning: "Desk" },
+            { term: "いす", hiragana: "いす", meaning: "Chair" },
+            { term: "チョコレート", hiragana: "チョコレート", meaning: "Chocolate" },
+            { term: "コーヒー", hiragana: "コーヒー", meaning: "Coffee" },
+            { term: "英語", hiragana: "えいご", meaning: "The English language" },
+            { term: "日本語", hiragana: "にほんご", meaning: "The Japanese language" },
+            { term: "～語", hiragana: "～ご", meaning: "~ language" },
+            { term: "何", hiragana: "なん", meaning: "What" },
+            { term: "そう", hiragana: "そう", meaning: "So" },
+            { term: "違います", hiragana: "ちがいます", meaning: "No it isn't, You are wrong, be different" },
+            { term: "そうですか", hiragana: "そうですか", meaning: "I see, Is that so?" },
+            { term: "あのう", hiragana: "あのう", meaning: "Well (used to show hesitation)" },
+            { term: "ほんの気持ちです", hiragana: "ほんのきもちです", meaning: "It's nothing, It's a token of my gratitude" },
+            { term: "どうぞ", hiragana: "どうぞ", meaning: "Please, Here you are (when offering someone something)" },
+            { term: "どうも", hiragana: "どうも", meaning: "Well, thanks, it appears that (used when making a tentative judgement)" },
+            { term: "ありがとう", hiragana: "ありがとう", meaning: "Thank you" },
+            { term: "どうもありがとうございます", hiragana: "どうもありがとございます", meaning: "Thank you very much" },
+            { term: "これからお世話になります", hiragana: "これからおせわになります", meaning: "I hope for your kind assistance hereafter" },
+            { term: "こちらこそよろしく", hiragana: "こちらこそよろしく", meaning: "I am pleased to meet you" }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+
+        function loadQuestion() {
+            const questionDiv = document.getElementById("question");
+            const optionsDiv = document.getElementById("options");
+            const term = terms[currentQuestionIndex];
+            let questionText = term.term;
+            if (/[一-龯]/.test(term.term)) {
+                questionText += ` (${term.hiragana})`;
+            }
+            questionDiv.innerHTML = `<strong>Question ${currentQuestionIndex + 1}:</strong> What is the meaning of '${questionText}'?`;
+            optionsDiv.innerHTML = "";
+            
+            const correctAnswer = term.meaning;
+            const options = [correctAnswer];
+            while (options.length < 4) {
+                const randomOption = terms[Math.floor(Math.random() * terms.length)].meaning;
+                if (!options.includes(randomOption)) {
+                    options.push(randomOption);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+            
+            options.forEach(option => {
+                const optionDiv = document.createElement("div");
+                optionDiv.className = "option";
+                optionDiv.innerText = option;
+                optionDiv.onclick = () => selectAnswer(option);
+                optionsDiv.appendChild(optionDiv);
+            });
+        }
+
+        function selectAnswer(selectedText) {
+            userAnswers[currentQuestionIndex] = selectedText;
+            if (currentQuestionIndex < terms.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                document.getElementById("submit-btn").disabled = false;
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        }
+
+        function submitTest() {
+            let score = userAnswers.filter((answer, index) => answer === terms[index].meaning).length;
+            document.getElementById("result").innerText = `Your score: ${score} out of ${terms.length} (${score} correct answers)`;
+        }
+        
+        loadQuestion();
+    </script>
+</body>
+</html>

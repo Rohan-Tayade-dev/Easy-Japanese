@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 1 Practice</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #000000;
+            --accent-color: #FFF8E1;
+            --dark-primary: #000000;
+            --dark-accent: #2E2E2E;
+            --highlight: #FFD700;
+            --dark-text: #FFD700;
+            --correct-color: #4CAF50;
+            --incorrect-color: #FF5252;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            transition: background-color 0.3s, color 0.3s;
+            margin: 0;
+            padding: 0;
+        }
+
+        .dark-mode {
+            background-color: var(--dark-primary);
+            color: var(--dark-text);
+        }
+
+        .quiz-container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dark-mode .quiz-container {
+            background: var(--dark-accent);
+        }
+
+        .option {
+            display: block;
+            background: #FFD700;
+            color: black;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            font-size: 20px;
+        }
+
+        .option:hover {
+            background: #FFC107;
+            transform: scale(1.05);
+        }
+
+        .dark-mode .option {
+            background: var(--dark-text);
+            color: var(--dark-primary);
+        }
+
+        .result {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .restart-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: var(--accent-color);
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+            font-size: 20px;
+        }
+
+        .dark-mode .restart-btn {
+            background: var(--dark-text);
+            color: var(--dark-primary);
+        }
+
+        #question {
+            font-size: 24px;
+        }
+
+        #hiragana {
+            font-size: 18px;
+            color: #555;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Quick Japanese Practice</h1>
+        <p id="question">Loading...</p>
+        <p id="hiragana"></p>
+        <div id="options"></div>
+        <p id="progress">0/46 completed</p>
+        <p id="mistakes">Mistakes: 0</p>
+        <p id="time">Time: 0s</p>
+    </div>
+    <script>
+        const terms = [
+            { term: "わたし", hiragana: "わたし", meaning: "I" },
+            { term: "わたしたち", hiragana: "わたしたち", meaning: "We" },
+            { term: "あなた", hiragana: "あなた", meaning: "You" },
+            { term: "あの人", hiragana: "あのひと", meaning: "That person" },
+            { term: "あの方", hiragana: "あのかた", meaning: "That person (polite)" },
+            { term: "皆さん", hiragana: "みなさん", meaning: "Ladies and gentlemen" },
+            { term: "～さん", hiragana: "～さん", meaning: "Mr./Ms." },
+            { term: "～ちゃん", hiragana: "～ちゃん", meaning: "Child’s name suffix" },
+            { term: "～君", hiragana: "～くん", meaning: "Boy’s name suffix" },
+            { term: "～人", hiragana: "～じん", meaning: "Nationality suffix" },
+            { term: "先生", hiragana: "せんせい", meaning: "Teacher" },
+            { term: "教師", hiragana: "きょうし", meaning: "Teacher" },
+            { term: "学生", hiragana: "がくせい", meaning: "Student" },
+            { term: "会社員", hiragana: "かいしゃいん", meaning: "Company employee" },
+            { term: "社員", hiragana: "しゃいん", meaning: "Company employee" },
+            { term: "銀行員", hiragana: "ぎんこういん", meaning: "Bank employee" },
+            { term: "医者", hiragana: "いしゃ", meaning: "Medical doctor" },
+            { term: "研究者", hiragana: "けんきゅうしゃ", meaning: "Researcher" },
+            { term: "エンジニア", hiragana: "エンジニア", meaning: "Engineer" },
+            { term: "大学", hiragana: "だいがく", meaning: "University" },
+            { term: "病院", hiragana: "びょういん", meaning: "Hospital" },
+            { term: "電気", hiragana: "でんき", meaning: "Light" },
+            { term: "だれ", hiragana: "だれ", meaning: "Who" },
+            { term: "どなた", hiragana: "どなた", meaning: "Who (polite)" },
+            { term: "～歳", hiragana: "～さい", meaning: "Years old" },
+            { term: "何歳", hiragana: "なんさい", meaning: "How old" },
+            { term: "おいくつ", hiragana: "おいくつ", meaning: "How old (polite)" },
+            { term: "はい", hiragana: "はい", meaning: "Yes" },
+            { term: "いいえ", hiragana: "いいえ", meaning: "No" },
+            { term: "失礼ですが", hiragana: "しつれいですが", meaning: "Excuse me, but" },
+            { term: "お名前は", hiragana: "おなまえは", meaning: "May I have your name?" },
+            { term: "初めまして", hiragana: "はじめまして", meaning: "How do you do?" },
+            { term: "どうぞよろしく", hiragana: "どうぞよろしく", meaning: "Pleased to meet you" },
+            { term: "こちらは～さんです", hiragana: "こちらは～さんです", meaning: "This is Mr./Ms. ~" },
+            { term: "～から来ました", hiragana: "～からきました", meaning: "I came from ~" },
+            { term: "アメリカ", hiragana: "アメリカ", meaning: "U.S.A." },
+            { term: "イギリス", hiragana: "イギリス", meaning: "U.K." },
+            { term: "インド", hiragana: "インド", meaning: "India" },
+            { term: "インドネシア", hiragana: "インドネシア", meaning: "Indonesia" },
+            { term: "韓国", hiragana: "かんこく", meaning: "South Korea" },
+            { term: "タイ", hiragana: "タイ", meaning: "Thailand" },
+            { term: "中国", hiragana: "ちゅうごく", meaning: "China" },
+            { term: "ドイツ", hiragana: "ドイツ", meaning: "Germany" },
+            { term: "日本", hiragana: "にほん", meaning: "Japan" },
+            { term: "フランス", hiragana: "フランス", meaning: "France" },
+            { term: "ブラジル", hiragana: "ブラジル", meaning: "Brazil" }
+        ];
+
+        let progress = {}; // Tracks correct/incorrect answers
+        let mistakes = 0; // Total mistakes
+        let startTime = Date.now(); // Start time of the quiz
+        let totalQuestions = 46; // Total questions in the session
+        let incorrectTerms = []; // Stores terms answered incorrectly
+        let questionsAnswered = 0; // Counter for questions answered
+
+        function updateTime() {
+            document.getElementById("time").innerText = `Time: ${Math.round((Date.now() - startTime) / 1000)}s`;
+        }
+        setInterval(updateTime, 1000);
+
+        function getNextTerm() {
+            // Prioritize incorrect terms first
+            if (incorrectTerms.length > 0) {
+                return incorrectTerms.shift(); // Return and remove the first incorrect term
+            }
+            // Otherwise, pick a random term that hasn't been asked yet
+            let remaining = terms.filter(term => !progress[term.term]);
+            return remaining.length > 0 ? remaining[Math.floor(Math.random() * remaining.length)] : null;
+        }
+
+        function loadQuestion() {
+            questionsAnswered = Object.keys(progress).length; // Update counter based on actual progress
+            document.getElementById("progress").innerText = `${questionsAnswered}/${totalQuestions} completed`;
+            document.getElementById("mistakes").innerText = `Mistakes: ${mistakes}`;
+
+            if (questionsAnswered >= totalQuestions) {
+                let timeTaken = Math.round((Date.now() - startTime) / 1000);
+                document.querySelector(".quiz-container").innerHTML = `
+                    <h1>Practice Complete!</h1>
+                    <p>You made ${mistakes} mistakes.</p>
+                    <p>Time taken: ${timeTaken}s</p>
+                    <a href='' class='restart-btn'>Restart</a>
+                `;
+                return;
+            }
+
+            let currentTerm = getNextTerm();
+            if (!currentTerm) {
+                return; // No need for duplicate completion code
+            }
+
+            document.getElementById("question").innerText = `What is the meaning of '${currentTerm.term}'?`;
+            document.getElementById("hiragana").innerText = `Hiragana: ${currentTerm.hiragana}`; // Display hiragana
+            let correctAnswer = currentTerm.meaning;
+            let options = new Set([correctAnswer]);
+            while (options.size < 4) {
+                options.add(terms[Math.floor(Math.random() * terms.length)].meaning);
+            }
+            options = Array.from(options).sort(() => Math.random() - 0.5);
+
+            document.getElementById("options").innerHTML = options.map(opt => 
+                `<div class='option' onclick='checkAnswer("${currentTerm.term}", "${opt}")'>${opt}</div>`
+            ).join('');
+        }
+
+        function checkAnswer(term, answer) {
+            const options = document.querySelectorAll('.option');
+            const correctAnswer = terms.find(t => t.term === term).meaning;
+
+            options.forEach(option => {
+                option.style.pointerEvents = 'none';
+                if (option.textContent === correctAnswer) {
+                    option.style.backgroundColor = 'var(--correct-color)';
+                } else if (option.textContent === answer) {
+                    option.style.backgroundColor = 'var(--incorrect-color)';
+                }
+            });
+
+            if (answer === correctAnswer) {
+                progress[term] = true; // Mark as correct
+            } else {
+                mistakes++;
+                incorrectTerms.push(terms.find(t => t.term === term)); // Add to incorrect list
+            }
+
+            setTimeout(() => {
+                loadQuestion();
+            }, 1000);
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>

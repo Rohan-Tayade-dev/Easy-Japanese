@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 9 Test</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #000000;
+            --accent-color: #FFF8E1;
+            --dark-primary: #000000;
+            --dark-accent: #2E2E2E;
+            --highlight: #FFD700;
+            --dark-text: #FFD700;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            transition: background-color 0.3s, color 0.3s;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dark-mode .quiz-container {
+            background: var(--dark-accent);
+        }
+
+        .question {
+            margin-bottom: 20px;
+            font-size: 20px;
+            text-align: left;
+            color: #333;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .option {
+            display: block;
+            background: #FFD700;
+            color: black;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .option:hover {
+            background: #FFC107;
+            transform: scale(1.02);
+        }
+
+        .option.selected {
+            background: #FFC107;
+            transform: scale(1.02);
+        }
+
+        .dark-mode .option {
+            background: var(--dark-text);
+            color: var(--dark-primary);
+        }
+
+        .result {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: var(--accent-color);
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-size: 16px;
+        }
+
+        .nav-btn:hover {
+            background: #333;
+        }
+
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .dark-mode .nav-btn {
+            background: var(--dark-text);
+            color: var(--dark-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Lesson 9 Test</h1>
+        <div id="quiz">
+            <div id="question" class="question"></div>
+            <div id="options" class="options"></div>
+        </div>
+        <div class="navigation-buttons">
+            <button id="prev-btn" class="nav-btn" onclick="prevQuestion()">Previous</button>
+        </div>
+        <button id="submit-btn" class="nav-btn" onclick="submitTest()" style="margin-top: 20px;" disabled>Submit</button>
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const terms = [
+            { term: "わかります", hiragana: "わかります", meaning: "understand" },
+            { term: "あります", hiragana: "あります", meaning: "have, be held, take place" },
+            { term: "好き", hiragana: "すき", meaning: "like" },
+            { term: "嫌い", hiragana: "きらい", meaning: "dislike" },
+            { term: "上手", hiragana: "じょうず", meaning: "good at" },
+            { term: "下手", hiragana: "へた", meaning: "poor at" },
+            { term: "料理", hiragana: "りょうり", meaning: "dish (cooked food), cooking" },
+            { term: "飲み物", hiragana: "のみもの", meaning: "drinks" },
+            { term: "スポーツ", hiragana: "スポーツ", meaning: "sport" },
+            { term: "スポーツをします", hiragana: "スポーツをします", meaning: "play sports" },
+            { term: "野球", hiragana: "やきゅう", meaning: "baseball" },
+            { term: "野球をします", hiragana: "やきゅうをします", meaning: "play baseball" },
+            { term: "ダンス", hiragana: "ダンス", meaning: "dance" },
+            { term: "ダンスをします", hiragana: "ダンスをします", meaning: "dance (verb)" },
+            { term: "音楽", hiragana: "おんがく", meaning: "music" },
+            { term: "歌", hiragana: "うた", meaning: "song" },
+            { term: "クラシック", hiragana: "クラシック", meaning: "classical music" },
+            { term: "ジャズ", hiragana: "ジャズ", meaning: "jazz" },
+            { term: "コンサート", hiragana: "コンサート", meaning: "concert" },
+            { term: "カラオケ", hiragana: "カラオケ", meaning: "karaoke" },
+            { term: "歌舞伎", hiragana: "かぶき", meaning: "Kabuki (traditional Japanese musical drama)" },
+            { term: "絵", hiragana: "え", meaning: "picture, drawing" },
+            { term: "字", hiragana: "じ", meaning: "letter, character" },
+            { term: "漢字", hiragana: "かんじ", meaning: "Chinese characters" },
+            { term: "ひらがな", hiragana: "ひらがな", meaning: "Hiragana script" },
+            { term: "かたかな", hiragana: "かたかな", meaning: "Katakana script" },
+            { term: "ローマ字", hiragana: "ローマじ", meaning: "the Roman alphabet" },
+            { term: "細かいお金", hiragana: "こまかいおかね", meaning: "small change" },
+            { term: "チケット", hiragana: "チケット", meaning: "ticket" },
+            { term: "時間", hiragana: "じかん", meaning: "time" },
+            { term: "用事", hiragana: "ようじ", meaning: "something to do, errand" },
+            { term: "約束", hiragana: "やくそく", meaning: "appointment, promise" },
+            { term: "ご主人", hiragana: "ごしゅじん", meaning: "(someone else's) husband" },
+            { term: "夫", hiragana: "おっと", meaning: "(my) husband" },
+            { term: "主人", hiragana: "しゅじん", meaning: "(my) husband" },
+            { term: "奥さん", hiragana: "おくさん", meaning: "(someone else's) wife" },
+            { term: "妻", hiragana: "つま", meaning: "(my) wife" },
+            { term: "家内", hiragana: "かない", meaning: "(my) wife" },
+            { term: "子ども", hiragana: "こども", meaning: "child" },
+            { term: "よく", hiragana: "よく", meaning: "well, much, often" },
+            { term: "だいたい", hiragana: "だいたい", meaning: "mostly, roughly" },
+            { term: "たくさん", hiragana: "たくさん", meaning: "many, much" },
+            { term: "少し", hiragana: "すこし", meaning: "a little, a few" },
+            { term: "全然", hiragana: "ぜんぜん", meaning: "not at all (used with negatives)" },
+            { term: "早く", hiragana: "はやく", meaning: "early, quickly, fast" },
+            { term: "速く", hiragana: "はやく", meaning: "quickly, fast" },
+            { term: "どうして", hiragana: "どうして", meaning: "why" },
+            { term: "残念です", hiragana: "ざんねんです", meaning: "I'm sorry (to hear that), That's a pity" },
+            { term: "もしもし", hiragana: "もしもし", meaning: "hello (used on phone)" },
+            { term: "ああ", hiragana: "ああ", meaning: "oh" },
+            { term: "いっしょうにいかがですか", hiragana: "いっしょうにいかがですか", meaning: "Won't you join me (us)?" },
+            { term: "～はちょっと", hiragana: "～はちょっと", meaning: "~ is a bit difficult (a euphemism used when declining an invitation)" },
+            { term: "だめですか", hiragana: "だめですか", meaning: "So you cannot (come)?" },
+            { term: "また今度お願いします", hiragana: "またこんどおねがいします", meaning: "Please ask me again some other time (used when refusing an invitation indirectly)" }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+
+        function loadQuestion() {
+            const questionDiv = document.getElementById("question");
+            const optionsDiv = document.getElementById("options");
+            const term = terms[currentQuestionIndex];
+            let questionText = term.term;
+            if (/[一-龯]/.test(term.term)) {
+                questionText += ` (${term.hiragana})`;
+            }
+            questionDiv.innerHTML = `<strong>Question ${currentQuestionIndex + 1}:</strong> What is the meaning of '${questionText}'?`;
+            optionsDiv.innerHTML = "";
+            
+            const correctAnswer = term.meaning;
+            const options = [correctAnswer];
+            while (options.length < 4) {
+                const randomOption = terms[Math.floor(Math.random() * terms.length)].meaning;
+                if (!options.includes(randomOption)) {
+                    options.push(randomOption);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+            
+            options.forEach(option => {
+                const optionDiv = document.createElement("div");
+                optionDiv.className = "option";
+                optionDiv.innerText = option;
+                optionDiv.onclick = () => selectAnswer(option);
+                optionsDiv.appendChild(optionDiv);
+            });
+        }
+
+        function selectAnswer(selectedText) {
+            userAnswers[currentQuestionIndex] = selectedText;
+            if (currentQuestionIndex < terms.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                document.getElementById("submit-btn").disabled = false;
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        }
+
+        function submitTest() {
+            let score = userAnswers.filter((answer, index) => answer === terms[index].meaning).length;
+            document.getElementById("result").innerText = `Your score: ${score} out of ${terms.length} (${score} correct answers)`;
+        }
+        
+        loadQuestion();
+    </script>
+</body>
+</html>
